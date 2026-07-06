@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 10px;
+    background: transparent;
+    font-family: Arial, sans-serif;
+    color: #222;
+  }
+
+  .widget {
+    width: 410px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 18px;
+    align-items: center;
+  }
+
+  .bar {
+    height: 34px;
+    border: 2px solid #333;
+    border-radius: 7px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .fill {
+    height: 100%;
+    background: #36332d;
+  }
+
+  .label {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+
+<body>
+  <div class="widget">
+    <div class="bar"><div class="fill" id="year"></div></div>
+    <div class="label">Year: <span id="yearText"></span>%</div>
+
+    <div class="bar"><div class="fill" id="month"></div></div>
+    <div class="label">Month: <span id="monthText"></span>%</div>
+
+    <div class="bar"><div class="fill" id="week"></div></div>
+    <div class="label">Week: <span id="weekText"></span>%</div>
+
+    <div class="bar"><div class="fill" id="day"></div></div>
+    <div class="label">Day: <span id="dayText"></span>%</div>
+  </div>
+
+<script>
+function percentage(part, total) {
+  return Math.floor((part / total) * 100);
+}
+
+function updateProgress() {
+  const now = new Date();
+
+  const startYear = new Date(now.getFullYear(), 0, 1);
+  const endYear = new Date(now.getFullYear() + 1, 0, 1);
+
+  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+  const dayOfWeek = (now.getDay() + 6) % 7;
+  const startWeek = new Date(now);
+  startWeek.setDate(now.getDate() - dayOfWeek);
+  startWeek.setHours(0, 0, 0, 0);
+
+  const endWeek = new Date(startWeek);
+  endWeek.setDate(startWeek.getDate() + 7);
+
+  const startDay = new Date(now);
+  startDay.setHours(0, 0, 0, 0);
+
+  const endDay = new Date(now);
+  endDay.setHours(24, 0, 0, 0);
+
+  const values = {
+    year: percentage(now - startYear, endYear - startYear),
+    month: percentage(now - startMonth, endMonth - startMonth),
+    week: percentage(now - startWeek, endWeek - startWeek),
+    day: percentage(now - startDay, endDay - startDay)
+  };
+
+  for (const key in values) {
+    document.getElementById(key).style.width = values[key] + "%";
+    document.getElementById(key + "Text").textContent = values[key];
+  }
+}
+
+updateProgress();
+setInterval(updateProgress, 60000);
+</script>
+</body>
+</html>
